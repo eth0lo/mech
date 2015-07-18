@@ -1,0 +1,20 @@
+{
+  "name": "bbview-virtual",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./test/view.js | tap-dot"
+  },
+  "author": "Jean Carlos Meninno <eth0.lo@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "backbone": "^1.2.1",
+    "jquery": "^2.1.4",
+    "jsdom": "^3.1.2"
+  },
+  "devDependencies": {
+    "tap-dot": "^1.0.0",
+    "tape": "^4.0.0"
+  }
+}
