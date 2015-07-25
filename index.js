@@ -2,17 +2,11 @@ var Backbone      = require('backbone');
 var document      = require('jsdom').jsdom();
 var window        = document.parentWindow;
 var $             = require('jquery')(window);
-var View          = Backbone.View;
 
-Backbone.$ = $;
+var jQueryAjaxBridge = require('./src/jquery_ajax_node_bridge');
+var backboneViewBridge = require('./src/backbone_view_node_bridge');
 
-var Virtual = View.extend({
-  _createElement: function(tagName) {
-    return document.createElement(tagName);
-  }
-});
-
-Backbone.View = Virtual;
-Backbone.ViewContext = document;
+jQueryAjaxBridge($);
+backboneViewBridge(Backbone, $, document);
 
 module.exports = Backbone;
