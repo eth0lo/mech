@@ -1,7 +1,7 @@
 {
-  "name": "Backbone.View.ServerSide",
+  "name": "Backbone.Node",
   "version": "1.0.0",
-  "description": "Render Backbone.View ServerSide",
+  "description": "Use Backbone server side",
   "main": "index.js",
   "scripts": {
     "test": "node ./test/view.js | tap-dot"
