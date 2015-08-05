@@ -4,7 +4,7 @@ module.exports = function(Backbone, $, document) {
 
   var View = Backbone.View;
 
-	var Virtual = View.extend({
+  var Virtual = View.extend({
     _createElement: function(tagName) {
       return document.createElement(tagName);
     }
