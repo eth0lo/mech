@@ -9,9 +9,7 @@
   "author": "Jean Carlos Meninno",
   "license": "MIT",
   "dependencies": {
-    "backbone-super-sync": "^0.1.1",
-    "domino": "^1.0.19",
-    "jsdom": "^3.1.2"
+    "domino": "^1.0.19"
   },
   "peerDependencies": {
     "backbone": "^1.2.1",

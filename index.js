@@ -54,16 +54,11 @@ $.ajaxTransport(function(options, originalOptions, jqXHR) {
 Backbone.$ = $;
 
 // Modify Backbone to be able to render server side
-var cheerio = require('cheerio');
-
-Backbone.View.prototype.setElement = function($cheerio) {
-    this.$el = $cheerio("*");
-    return this;
-},
-
 Backbone.View.prototype._createElement = function(tagName) {
-    return cheerio.load('<' + tagName + '>');
+    return window.document.createElement(tagName);
 }
+
+Backbone.ViewContext = window.document;
 
 module.exports = Backbone;
 
