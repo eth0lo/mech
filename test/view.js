@@ -1,5 +1,5 @@
 var test = require('tape')
-var Backbone = require('../index');
+var Backbone = require('../src/node');
 
 function createTestView() {
   return new Backbone.View({
