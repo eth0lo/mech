@@ -1,8 +1,11 @@
 {
-  "name": "Backbone.Node",
-  "version": "1.0.0",
+  "name": "mech",
+  "version": "0.0.1",
   "description": "Use Backbone server side",
-  "main": "index.js",
+  "main": "./src/node",
+  "browser": {
+    "./src/node": "./src/browser"
+  },
   "scripts": {
     "test": "node ./test/view.js | tap-dot"
   },
