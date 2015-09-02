@@ -1,5 +1,8 @@
 var test = require('tape')
-var Backbone = require('../src/node').Backbone;
+var mech = require('../src/node');
+
+var Backbone    = mech.Backbone;
+var viewContext = mech.viewContext;
 
 function createTestView() {
   return new Backbone.View({
@@ -9,7 +12,7 @@ function createTestView() {
   });
 }
 
-var doc = Backbone.ViewContext;
+var doc = viewContext.document;
 var div = doc.createElement('div');
 var h1  = doc.createElement('h1');
 function createTestNode() {

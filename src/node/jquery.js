@@ -1,6 +1,6 @@
-var window   = require('./window');
-var jQuery   = require('jquery');
-var $        = jQuery(window);
+var viewContext = require('./view_context');
+var jQuery      = require('jquery');
+var $           = jQuery(viewContext);
 
 var parseUrl = require('url').parse;
 var http     = require('http');

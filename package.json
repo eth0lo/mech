@@ -17,6 +17,7 @@
   },
   "peerDependencies": {
     "backbone": "^1.2.1",
+    "jade": "^1.11.0",
     "jquery": "^2.1.4"
   },
   "devDependencies": {
