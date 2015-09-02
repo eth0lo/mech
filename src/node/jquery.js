@@ -15,7 +15,7 @@ $.ajaxTransport(function(options, originalOptions, jqXHR) {
   var url = parseUrl(options.url);
   var protocol = PROTOCOL_MAP[url.protocol];
   var req;
-  console.time('request')
+
   url.method = options.type;
   return {
     send: function(headers, complete) {
@@ -37,7 +37,6 @@ $.ajaxTransport(function(options, originalOptions, jqXHR) {
         });
 
         res.on('end', function() {
-          console.timeEnd('request')
           complete(res.statusCode, res.statusMessage, {text:data}, res.headers);
         });
     });
