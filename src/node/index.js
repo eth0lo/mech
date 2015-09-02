@@ -1,8 +1,14 @@
-var window   = require('./window');
-var $        = require('./jquery');
-var Backbone = require('./backbone');
+var window     = require('./window');
+var $          = require('./jquery');
+var Backbone   = require('./backbone');
+var middleware = require('./express/render_middleware');
+var viewEngine = require('./express/view_engine');
 
 module.exports = {
-  Backbone: Backbone,
-  $:        $
-}
+  Backbone:   Backbone,
+  $:          $,
+  express: {
+    middleware: middleware,
+    viewEngine: viewEngine
+  }
+};

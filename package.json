@@ -12,7 +12,8 @@
   "author": "Jean Carlos Meninno",
   "license": "MIT",
   "dependencies": {
-    "domino": "^1.0.19"
+    "domino": "^1.0.19",
+    "underscore": "^1.8.3"
   },
   "peerDependencies": {
     "backbone": "^1.2.1",
