@@ -24,6 +24,8 @@ module.exports = function (filePath, options, callback) {
   var page = renderer.page();
   var main = page.querySelector('[data-region="main"]');
 
-  main.appendChild(view.render().el);
-  return callback(null, page.outerHTML);
+  var html = main.appendChild(view.render().el).outerHTML;
+
+  main.innerHTML = '';
+  return callback(null, html);
 };
