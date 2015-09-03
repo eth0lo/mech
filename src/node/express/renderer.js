@@ -34,7 +34,7 @@ Renderer.prototype.updateContext = function() {
   viewContext.load(this.layout);
 };
 
-Renderer.prototype.page = function() {
+Renderer.prototype.document = function() {
   return viewContext.document;
 };
 
