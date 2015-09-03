@@ -3,7 +3,7 @@ var Renderer   = require('./renderer');
 
 module.exports = function(req, res, next) {
   var components = new Components();
-  res.components = components;
+  res.page = components;
   res.locals.components = components;
 
   var renderer = new Renderer(req.app);
