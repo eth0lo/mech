@@ -14,4 +14,6 @@ Backbone.View.prototype._createElement = function(tagName) {
   return window.document.createElement(tagName);
 }
 
+Backbone.ctx = window;
+
 module.exports = Backbone;
