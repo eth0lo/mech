@@ -1,20 +1,12 @@
 var test = require('tape')
 var mech = require('../src/node');
 
-var Backbone    = mech.Backbone;
-var viewContext = mech.viewContext;
+var Backbone = mech.Backbone;
+var window   = Backbone.ctx;
+var doc      = window.document;
+var div      = doc.createElement('div');
+var h1       = doc.createElement('h1');
 
-function createTestView() {
-  return new Backbone.View({
-    id        : 'test-view',
-    className : 'test-view',
-    other     : 'non-special-option'
-  });
-}
-
-var doc = viewContext.document;
-var div = doc.createElement('div');
-var h1  = doc.createElement('h1');
 function createTestNode() {
   div.id = 'testElement';
   h1.innerHTML = 'Test';
@@ -25,6 +17,14 @@ function createTestNode() {
 
 function destroyTestNode() {
   doc.body.removeChild(div);
+}
+
+function createTestView() {
+  return new Backbone.View({
+    id        : 'test-view',
+    className : 'test-view',
+    other     : 'non-special-option'
+  });
 }
 
 test("constructor", function(t) {
