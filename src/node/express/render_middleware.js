@@ -1,12 +1,14 @@
-var Page = require('./page');
-var Renderer   = require('./renderer');
+var Page     = require('./page');
+var Backbone = require('../backbone');
 
 module.exports = function(req, res, next) {
-  var page = new Page(res);
+  var page = new Page(req.app, req, res);
   res.page = page;
   res.locals.page = page;
 
-  var renderer = new Renderer(req.app);
-  res.locals.renderer = renderer;
+  req.when = function() {
+    return Backbone.$.when.apply(Backbone.$, arguments);
+  }
+
   next();
 }

@@ -1,7 +1,3 @@
-var viewContext = require('./view_context');
-var jQuery      = require('jquery');
-var $           = jQuery(viewContext);
-
 var parseUrl = require('url').parse;
 var http     = require('http');
 var https    = require('https');
@@ -11,13 +7,14 @@ var PROTOCOL_MAP = {
   'https:': https
 }
 
-$.ajaxTransport(function(options, originalOptions, jqXHR) {
+module.exports = function(options, originalOptions, jqXHR) {
   var url = parseUrl(options.url);
   var protocol = PROTOCOL_MAP[url.protocol];
   var req;
 
   url.method = options.type;
   return {
+
     send: function(headers, complete) {
       req = createRequest(headers, complete);
       req.end();
@@ -41,6 +38,5 @@ $.ajaxTransport(function(options, originalOptions, jqXHR) {
         });
     });
   }
-});
+};
 
-module.exports = $;
