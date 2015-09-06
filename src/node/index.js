@@ -1,13 +1,15 @@
 var Backbone = require('./backbone');
-var helpers  = require('./express/helpers');
-var auto     = require('./express/default');
+var data     = require('./express/data');
+var render   = require('./express/render');
 
 module.exports = {
   Backbone:   Backbone,
   middleware: {
+    data: {
+      helpers: data
+    },
     render: {
-      helpers: helpers,
-      default: auto
+      helpers: render
     }
   }
 };
