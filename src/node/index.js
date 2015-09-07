@@ -1,9 +1,13 @@
-var Backbone = require('./backbone');
-var data     = require('./express/data');
-var render   = require('./express/render');
+var Backbone    = require('./backbone');
+var data        = require('./express/data');
+var render      = require('./express/render');
+var Model       = require('./model');
+var Collection  = require('./collection');
 
 module.exports = {
-  Backbone:   Backbone,
+  Model: Model,
+  Collection: Collection,
+  Backbone: Backbone,
   middleware: {
     data: {
       helpers: data

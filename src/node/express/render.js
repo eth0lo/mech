@@ -21,10 +21,14 @@ module.exports = function(options) {
       var contentHtml = contentView.render().el.outerHTML;
 
       options.content = contentHtml;
-      options.bootstrap = {
-        content: {
-          collection: contentCollection.toJSON()
-        }
+      options.bootstrap = {};
+
+      if(contentView.model) {
+        options.bootstrap[contentView.model.name] = contentView.model.raw;
+      }
+
+      if(contentView.collection) {
+        options.bootstrap[contentView.collection.name] = contentView.collection.raw;
       }
 
       oldRender.call(res, defaultLayout, options);

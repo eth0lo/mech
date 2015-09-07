@@ -4,7 +4,7 @@
   "description": "Use Backbone server side",
   "main": "./src/node",
   "browser": {
-    "./src/node": "./src/browser"
+    "./src/node": "./src/client"
   },
   "scripts": {
     "test": "node ./test/view.js | tap-dot"
