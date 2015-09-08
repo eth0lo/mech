@@ -39,4 +39,3 @@ module.exports = function(options, originalOptions, jqXHR) {
     });
   }
 };
-
