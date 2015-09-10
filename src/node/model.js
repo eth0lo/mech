@@ -1,19 +1,15 @@
-var BaseModel = require('../shared/model');
+var Backbone      = require('./backbone');
+var nameValidator = require('../shared/name_validator');
+var promisable    = require('../shared/promisable');
+var saveResponse  = require('./save_response');
+var OriginalModel = Backbone.Model;
 
-var Model = BaseModel.extend({
+var Model = OriginalModel.extend({
   constructor: function() {
-    BaseModel.apply(this, arguments);
-  },
-
-  sync: function(options) {
-    var xhr = BaseModel.prototype.sync.apply(this, arguments);
-    xhr.done(this.saveResponse.bind(this));
-
-    return xhr;
-  },
-
-  saveResponse: function(data) {
-    this.raw = data;
+    nameValidator.call(this);
+    OriginalModel.apply(this, arguments);
+    promisable.call(this, Backbone.$);
+    saveResponse.call(this);
   }
 });
 

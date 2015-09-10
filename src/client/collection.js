@@ -1,10 +1,10 @@
-var BaseCollection = require('../shared/collection');
+var Backbone       = require('backbone');
 var bootstrapData  = require('./bootstrap_data');
 var $              = require('jquery');
 
-var Collection = BaseCollection.extend({
+var Collection = Backbone.Collection.extend({
   constructor: function() {
-    BaseCollection.apply(this, arguments);
+    Backbone.Collection.apply(this, arguments);
   },
 
   fetch: function(options) {
@@ -17,7 +17,7 @@ var Collection = BaseCollection.extend({
       return this.hidratedJqxhr(data);
     }
 
-    return BaseCollection.prototype.fetch.apply(this, arguments);
+    return Backbone.Collection.prototype.fetch.apply(this, arguments);
   },
 
   hidratedJqxhr: function(values) {
