@@ -15,6 +15,8 @@ module.exports = function() {
 
   var oldFetch = this.fetch;
   this.fetch = function(options) {
+    options = options || {};
+
     if(options.success) {
       options.success = this.wrapSuccess(options.success);
     } else {
