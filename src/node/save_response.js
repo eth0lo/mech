@@ -20,7 +20,7 @@ module.exports = function() {
     if(options.success) {
       options.success = this.wrapSuccess(options.success);
     } else {
-      options.success = this.saveData
+      options.success = this.saveData.bind(this);
     }
 
     return oldFetch.call(this, options);
