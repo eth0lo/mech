@@ -1,9 +1,15 @@
-var BaseModel     = require('../shared/model');
+var Backbone      = require('backbone');
+var $             = require('jquery');
+var nameValidator = require('../shared/name_validator');
+var promisable    = require('../shared/promisable');
 var bootstrapData = require('./bootstrap_data');
+var OriginalModel = Backbone.Model;
 
-var Model = BaseModel.extend({
+var Model = OriginalModel.extend({
   constructor: function() {
-    BaseModel.apply(this, arguments);
+    nameValidator.call(this);
+    OriginalModel.apply(this, arguments);
+    promisable.call(this, Backbone.$);
   },
 
   fetch: function(options) {
@@ -16,7 +22,7 @@ var Model = BaseModel.extend({
       return this.hidratedJqxhr(data);
     }
 
-    return BaseModel.prototype.fetch.apply(this, arguments);
+    return OriginalModel.prototype.fetch.apply(this, arguments);
   },
 
   hidratedJqxhr: function(values) {

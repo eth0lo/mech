@@ -1,10 +1,15 @@
-var Backbone       = require('backbone');
-var bootstrapData  = require('./bootstrap_data');
-var $              = require('jquery');
+var Backbone           = require('backbone');
+var $                  = require('jquery');
+var nameValidator      = require('../shared/name_validator');
+var promisable         = require('../shared/promisable');
+var bootstrapData      = require('./bootstrap_data');
+var OriginalCollection = Backbone.Collection;
 
-var Collection = Backbone.Collection.extend({
+var Collection = OriginalCollection.extend({
   constructor: function() {
-    Backbone.Collection.apply(this, arguments);
+    nameValidator.call(this);
+    OriginalCollection.apply(this, arguments);
+    promisable.call(this, Backbone.$);
   },
 
   fetch: function(options) {
@@ -17,7 +22,7 @@ var Collection = Backbone.Collection.extend({
       return this.hidratedJqxhr(data);
     }
 
-    return Backbone.Collection.prototype.fetch.apply(this, arguments);
+    return OriginalCollection.prototype.fetch.apply(this, arguments);
   },
 
   hidratedJqxhr: function(values) {
