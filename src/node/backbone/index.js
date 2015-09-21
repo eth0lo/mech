@@ -9,11 +9,6 @@ $.ajaxTransport(transport);
 
 Backbone.$   = $
 
-// Modify Backbone to be able to render server side
-Backbone.View.prototype._createElement = function(tagName) {
-  return window.document.createElement(tagName);
-}
-
 Backbone.ctx = window;
 
 module.exports = Backbone;

@@ -1,37 +1,36 @@
+var path = require('path');
+
 module.exports = function(options) {
   options = options || {};
 
   var defaultLayout = options.defaultLayout || 'layout/default';
 
   return function(req, res, next) {
-    res.viewData = {};
+    var viewRootPath  = req.app.get('views');
+    var oldRender     = res.render;
 
-    res.component = function(region, view) {
-      res.viewData[region] = view;
-    }
 
-    var oldRender = res.render;
-    res.render = function(view, options) {
-      options = options = {};
-      res.viewData.content = view;
+    res.render = function(viewPath, options) {
+      var mechViewPath = path.resolve(viewRootPath, viewPath);
+      var View = require(mechViewPath);
+      var view = new View(options);
 
-      var viewData = res.viewData;
-      var contentView = viewData.content;
-      var contentCollection = contentView.collection;
-      var contentHtml = contentView.render().el.outerHTML;
+      renderOptions = {};
 
-      options.content = contentHtml;
-      options.bootstrap = {};
+      var contentHtml = view.render().el.outerHTML;
 
-      if(contentView.model) {
-        options.bootstrap[contentView.model.name] = contentView.model.raw;
+      renderOptions.content = contentHtml;
+      renderOptions.bootstrap = {};
+
+      if(view.model) {
+        renderOptions.bootstrap[view.model.name] = view.model.raw;
       }
 
-      if(contentView.collection) {
-        options.bootstrap[contentView.collection.name] = contentView.collection.raw;
+      if(view.collection) {
+        renderOptions.bootstrap[view.collection.name] = view.collection.raw;
       }
 
-      oldRender.call(res, defaultLayout, options);
+      oldRender.call(res, defaultLayout, renderOptions);
     }
     next();
   }
