@@ -1,17 +1,23 @@
-var Backbone    = require('./backbone');
-var Marionette  = require('./marionette');
-var data        = require('./express/data');
-var render      = require('./express/render');
-var Model       = require('./model');
-var Collection  = require('./collection');
-var View        = require('./view');
+var Backbone       = require('./backbone');
+var Marionette     = require('./marionette');
+
+var Collection     = require('./collection');
+var Model          = require('./model');
+
+var CollectionView = require('./view_collection');
+var View           = require('./view');
+
+var data           = require('./express/data');
+var render         = require('./express/render');
+
 
 module.exports = {
-  Model: Model,
   Collection: Collection,
+  Model: Model,
+
+  CollectionView: CollectionView,
   View: View,
-  Backbone: Backbone,
-  Marionette: Marionette,
+
   middleware: {
     data: {
       helpers: data
@@ -19,5 +25,8 @@ module.exports = {
     render: {
       helpers: render
     }
-  }
+  },
+
+  Backbone: Backbone,
+  Marionette: Marionette
 };
