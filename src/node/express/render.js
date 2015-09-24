@@ -9,6 +9,24 @@ module.exports = function(options) {
     var viewRootPath  = req.app.get('views');
     var oldRender     = res.render;
 
+    function bootstrapData(view, data) {
+      if(view.model) {
+        data[view.model.name] = view.model.raw;
+      }
+
+      if(view.collection) {
+        data[view.collection.name] = view.collection.raw;
+      }
+
+      if(view.regionManager) {
+        view.regionManager.each(function(region) {
+          bootstrapData(region.currentView, data);
+        });
+      }
+
+      return data;
+    }
+
 
     res.render = function(viewPath, options) {
       var mechViewPath = path.resolve(viewRootPath, viewPath);
@@ -20,15 +38,9 @@ module.exports = function(options) {
       var contentHtml = view.render().el.outerHTML;
 
       renderOptions.content = contentHtml;
-      renderOptions.bootstrap = {};
+      renderOptions.bootstrap = bootstrapData(view, {});
 
-      if(view.model) {
-        renderOptions.bootstrap[view.model.name] = view.model.raw;
-      }
 
-      if(view.collection) {
-        renderOptions.bootstrap[view.collection.name] = view.collection.raw;
-      }
 
       oldRender.call(res, defaultLayout, renderOptions);
     }
