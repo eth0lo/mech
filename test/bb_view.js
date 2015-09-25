@@ -1,4 +1,4 @@
-var test    = require('tape')
+var test    = require('tape-catch')
 var mech    = require('../src/node');
 
 var helpers = require('./helpers');
@@ -11,7 +11,6 @@ test("constructor", function(t) {
   t.equal(view.el.id, 'test-view');
   t.equal(view.el.className, 'test-view');
   t.equal(view.el.other, void 0);
-
   t.end();
 });
 
