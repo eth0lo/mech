@@ -1,5 +1,6 @@
 var Backbone       = require('./backbone');
 var Marionette     = require('./marionette');
+var window         = require('./window');
 
 var Collection     = require('./collection');
 var Model          = require('./model');
@@ -28,5 +29,7 @@ module.exports = {
   },
 
   Backbone: Backbone,
-  Marionette: Marionette
+  Marionette: Marionette,
+
+  window: window
 };
