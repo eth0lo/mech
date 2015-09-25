@@ -1,34 +1,12 @@
-var test = require('tape')
-var mech = require('../src/node');
+var test    = require('tape')
+var mech    = require('../src/node');
 
-var Backbone = mech.Backbone;
-var window   = Backbone.ctx;
-var doc      = window.document;
-var div      = doc.createElement('div');
-var h1       = doc.createElement('h1');
-
-function createTestNode() {
-  div.id = 'testElement';
-  h1.innerHTML = 'Test';
-
-  div.appendChild(h1);
-  doc.body.appendChild(div);
-}
-
-function destroyTestNode() {
-  doc.body.removeChild(div);
-}
-
-function createTestView() {
-  return new Backbone.View({
-    id        : 'test-view',
-    className : 'test-view',
-    other     : 'non-special-option'
-  });
-}
+var helpers = require('./helpers');
+var doc     = mech.window.document;
+var $       = mech.Backbone.$;
 
 test("constructor", function(t) {
-  var view = createTestView();
+  var view = helpers.createTestView();
 
   t.equal(view.el.id, 'test-view');
   t.equal(view.el.className, 'test-view');
@@ -38,7 +16,7 @@ test("constructor", function(t) {
 });
 
 test("$", function(t) {
-  var view = createTestView();
+  var view = helpers.createTestView();
   view.setElement('<p><a><b>test</b></a></p>');
   var result = view.$('a b');
 
@@ -49,18 +27,18 @@ test("$", function(t) {
 });
 
 test("$el", function(t) {
-  var view = createTestView();
+  var view = helpers.createTestView();
   view.setElement('<p><a><b>test</b></a></p>');
   t.equal(view.el.nodeType, 1);
 
-  t.ok(view.$el instanceof Backbone.$);
+  t.ok(view.$el instanceof $);
   t.equal(view.$el[0], view.el);
 
   t.end();
 });
 
 test("initialize", function(t) {
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     initialize: function() {
       this.one = 1;
     }
@@ -72,17 +50,18 @@ test("initialize", function(t) {
 });
 
 test("render", function(t) {
-  var view = new Backbone.View();
+  // This test have been modified to pass marionette's restrictions on templates
+  var view = new mech.View({template:'<p><a><b>test</b></a></p>'});
   t.equal(view.render(), view, '#render returns the view instance');
 
   t.end();
 });
 
 test("delegateEvents", function(t) {
-  createTestNode();
+  helpers.createTestNode();
   var counter1 = 0, counter2 = 0;
 
-  var view = new Backbone.View({el: '#testElement'});
+  var view = new mech.View({el: '#testElement'});
   view.increment = function(){ counter1++; };
   view.$el.on('click', function(){ counter2++; });
 
@@ -103,13 +82,13 @@ test("delegateEvents", function(t) {
   t.equal(counter1, 3);
   t.equal(counter2, 3);
 
-  destroyTestNode();
+  helpers.destroyTestNode();
   t.end();
 });
 
 test("delegate", function(t) {
-  createTestNode();
-  var view = new Backbone.View({el: '#testElement'});
+  helpers.createTestNode();
+  var view = new mech.View({el: '#testElement'});
   view.delegate('click', 'h1', function() {
     t.ok(true);
   });
@@ -120,12 +99,12 @@ test("delegate", function(t) {
 
   t.equal(view.delegate(), view, '#delegate returns the view instance');
 
-  destroyTestNode();
+  helpers.destroyTestNode();
   t.end();
 });
 
 test("delegateEvents allows functions for callbacks", 3, function(t) {
-  var view = new Backbone.View({el: '<p></p>'});
+  var view = new mech.View({el: '<p></p>'});
   view.counter = 0;
 
   var events = {
@@ -151,7 +130,7 @@ test("delegateEvents allows functions for callbacks", 3, function(t) {
 
 
 test("delegateEvents ignore undefined methods", function(t) {
-  var view = new Backbone.View({el: '<p></p>'});
+  var view = new mech.View({el: '<p></p>'});
   view.delegateEvents({'click': 'undefinedMethod'});
   view.$el.trigger('click');
 
@@ -159,10 +138,10 @@ test("delegateEvents ignore undefined methods", function(t) {
 });
 
 test("undelegateEvents", function(t) {
-  createTestNode();
+  helpers.createTestNode();
   var counter1 = 0, counter2 = 0;
 
-  var view = new Backbone.View({el: '#testElement'});
+  var view = new mech.View({el: '#testElement'});
   view.increment = function(){ counter1++; };
   view.$el.on('click', function(){ counter2++; });
 
@@ -185,13 +164,13 @@ test("undelegateEvents", function(t) {
 
   t.equal(view.undelegateEvents(), view, '#undelegateEvents returns the view instance');
 
-  destroyTestNode();
+  helpers.destroyTestNode();
   t.end();
 });
 
 test("undelegate", function(t) {
-  createTestNode();
-  view = new Backbone.View({el: '#testElement'});
+  helpers.createTestNode();
+  view = new mech.View({el: '#testElement'});
   view.delegate('click', function() { t.ok(false); });
   view.delegate('click', 'h1', function() { t.ok(false); });
 
@@ -202,13 +181,13 @@ test("undelegate", function(t) {
 
   t.equal(view.undelegate(), view, '#undelegate returns the view instance');
 
-  destroyTestNode();
+  helpers.destroyTestNode();
   t.end();
 });
 
 test("undelegate with passed handler", function(t) {
-  createTestNode();
-  view = new Backbone.View({el: '#testElement'});
+  helpers.createTestNode();
+  view = new mech.View({el: '#testElement'});
 
   var listener = function() { t.ok(false); };
   view.delegate('click', listener);
@@ -217,13 +196,13 @@ test("undelegate with passed handler", function(t) {
 
   view.$el.trigger('click');
 
-  destroyTestNode();
+  helpers.destroyTestNode();
   t.end();
 });
 
 test("undelegate with selector", function(t) {
-  createTestNode();
-  view = new Backbone.View({el: '#testElement'});
+  helpers.createTestNode();
+  view = new mech.View({el: '#testElement'});
 
   view.delegate('click', function() { t.ok(true); });
   view.delegate('click', 'h1', function() { t.ok(false); });
@@ -232,13 +211,13 @@ test("undelegate with selector", function(t) {
   view.$('h1').trigger('click');
   view.$el.trigger('click');
 
-  destroyTestNode();
+  helpers.destroyTestNode();
   t.end();
 });
 
 test("undelegate with handler and selector", function(t) {
-  createTestNode();
-  view = new Backbone.View({el: '#testElement'});
+  helpers.createTestNode();
+  view = new mech.View({el: '#testElement'});
 
   view.delegate('click', function() { t.ok(true); });
   var handler = function(){ t.ok(false); };
@@ -248,12 +227,12 @@ test("undelegate with handler and selector", function(t) {
   view.$('h1').trigger('click');
   view.$el.trigger('click');
 
-  destroyTestNode();
+  helpers.destroyTestNode();
   t.end();
 });
 
 test("tagName can be provided as a string", function(t) {
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     tagName: 'span'
   });
 
@@ -263,7 +242,7 @@ test("tagName can be provided as a string", function(t) {
 });
 
 test("tagName can be provided as a function", function(t) {
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     tagName: function() {
       return 'p';
     }
@@ -275,7 +254,7 @@ test("tagName can be provided as a function", function(t) {
 });
 
 test("_ensureElement with DOM node el", function(t) {
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     el: doc.body
   });
 
@@ -285,19 +264,19 @@ test("_ensureElement with DOM node el", function(t) {
 });
 
 test("_ensureElement with string el", function(t) {
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     el: "body"
   });
   t.strictEqual(new View().el, doc.body);
 
-  createTestNode();
-  View = Backbone.View.extend({
+  helpers.createTestNode();
+  View = mech.View.extend({
     el: "#testElement > h1"
   });
-  t.strictEqual(new View().el, Backbone.$("#testElement > h1").get(0));
-  destroyTestNode();
+  t.strictEqual(new View().el, $("#testElement > h1").get(0));
+  helpers.destroyTestNode();
 
-  View = Backbone.View.extend({
+  View = mech.View.extend({
     el: "#nonexistent"
   });
   t.ok(!new View().el);
@@ -306,7 +285,7 @@ test("_ensureElement with string el", function(t) {
 });
 
 test("with className and id functions", function(t) {
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     className: function() {
       return 'className';
     },
@@ -322,7 +301,7 @@ test("with className and id functions", function(t) {
 });
 
 test("with attributes", 2, function(t) {
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     attributes: {
       id: 'id',
       'class': 'class'
@@ -336,7 +315,7 @@ test("with attributes", 2, function(t) {
 });
 
 test("with attributes as a function", function(t) {
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     attributes: function() {
       return {'class': 'dynamic'};
     }
@@ -349,9 +328,9 @@ test("with attributes as a function", function(t) {
 
 test("multiple views per element", function(t) {
   var count = 0;
-  var $el = Backbone.$('<p></p>');
+  var $el = $('<p></p>');
 
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     el: $el,
     events: {
       click: function() {
@@ -376,9 +355,7 @@ test("multiple views per element", function(t) {
 });
 
 test("custom events", function(t) {
-  var $ = Backbone.$;
-
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     el: $('body'),
     events: {
       "fake$event": function() { t.ok(true); }
@@ -395,10 +372,9 @@ test("custom events", function(t) {
 });
 
 test("#1048 - setElement uses provided object.", function(t) {
-  var $ = Backbone.$;
   var $el = $('body');
 
-  var view = new Backbone.View({el: $el});
+  var view = new mech.View({el: $el});
   t.ok(view.$el === $el);
 
   view.setElement($el = $($el));
@@ -408,11 +384,10 @@ test("#1048 - setElement uses provided object.", function(t) {
 });
 
 test("#986 - Undelegate before changing element.", function(t) {
-  var $ = Backbone.$;
   var button1 = $('<button></button>');
   var button2 = $('<button></button>');
 
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     events: {
       click: function(e) {
         t.ok(view.el === e.target);
@@ -430,7 +405,7 @@ test("#986 - Undelegate before changing element.", function(t) {
 });
 
 test("#1172 - Clone attributes object", function(t) {
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     attributes: {foo: 'bar'}
   });
 
@@ -444,7 +419,7 @@ test("#1172 - Clone attributes object", function(t) {
 });
 
 test("views stopListening", function(t) {
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     initialize: function() {
       this.listenTo(this.model, 'all x', function(){ t.ok(false); });
       this.listenTo(this.collection, 'all x', function(){ t.ok(false); });
@@ -452,8 +427,8 @@ test("views stopListening", function(t) {
   });
 
   var view = new View({
-    model: new Backbone.Model,
-    collection: new Backbone.Collection
+    model: new mech.Backbone.Model,
+    collection: new mech.Backbone.Collection
   });
 
   view.stopListening();
@@ -464,7 +439,7 @@ test("views stopListening", function(t) {
 });
 
 test("Provide function for el.", function(t) {
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     el: function() {
       return "<p><a></a></p>";
     }
@@ -478,10 +453,10 @@ test("Provide function for el.", function(t) {
 });
 
 test("events passed in options", function(t) {
-  createTestNode();
+  helpers.createTestNode();
   var counter = 0;
 
-  var View = Backbone.View.extend({
+  var View = mech.View.extend({
     el: '#testElement',
     increment: function() {
       counter++;
@@ -497,12 +472,12 @@ test("events passed in options", function(t) {
   view.$('h1').trigger('click').trigger('click');
   t.equal(counter, 2);
 
-  destroyTestNode();
+  helpers.destroyTestNode();
   t.end();
 });
 
 test("remove", function(t) {
-  var view = new Backbone.View;
+  var view = new mech.View;
   doc.body.appendChild(view.el);
 
   view.delegate('click', function() { t.ok(false); });
@@ -519,7 +494,7 @@ test("remove", function(t) {
 });
 
 test("setElement", function(t) {
-  var view = new Backbone.View({
+  var view = new mech.View({
     events: {
       click: function() { t.ok(false); }
     }
