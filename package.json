@@ -24,6 +24,7 @@
   "devDependencies": {
     "backbone": "^1.2.1",
     "jquery": "^2.1.4",
+    "sinon": "^1.17.1",
     "tap-dot": "^1.0.0",
     "tape": "^4.0.0"
   }

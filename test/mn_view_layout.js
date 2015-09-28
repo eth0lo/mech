@@ -1,9 +1,10 @@
 var test    = require('tape-catch')
 var mech    = require('../src/node');
+var sinon   = require('sinon');
 
 var helpers = require('./helpers');
-
 var View, regionOne, options, view;
+
 test('on instantiation', function(t){
 
   t.test('with regions defined', function(t){
@@ -86,58 +87,36 @@ test('on instantiation', function(t){
 });
 
 test('on rendering', function(t){
+  View = helpers.ViewWithRegions.extend({});
+  view = new View();
 
+  sinon.spy(view, 'onRender');
+  sinon.spy(view, 'onBeforeRender');
+  sinon.spy(view, 'trigger');
+  view.render();
+
+  view.regionOne._ensureElement();
+  var el = view.$('#regionOne');
+  t.deepEqual(view.regionOne.$el[0], el[0], 'should find the region scoped within the rendered template');
+
+  t.ok(view.onBeforeRender.calledOnce, 'should call "onBeforeRender" before rendering');
+  t.ok(view.onRender.calledOnce, 'should call "onRender" after rendering');
+  t.ok(view.onBeforeRender.calledBefore(view.onRender), 'should call "onBeforeRender" before "onRender"');
+
+  t.notOk(view.onBeforeRender.lastCall.returnValue, 'should be rendered when "onRender" is called');
+  t.ok(view.onRender.lastCall.returnValue, 'should be rendered when "onRender" is called');
+
+  t.ok(view.trigger.calledWith('before:render', view), 'should trigger a "before:render" event');
+  t.ok(view.trigger.calledWith('render', view), 'should trigger a "render" event');
+  t.ok(view.isRendered, true, 'should be marked rendered');
+
+  t.end();
 });
 
+test('when destroying', function(t){
 
-
-//   describe('on rendering', function() {
-//     beforeEach(function() {
-//       this.layoutViewManager = new this.LayoutView();
-//       sinon.spy(this.layoutViewManager, 'onRender');
-//       sinon.spy(this.layoutViewManager, 'onBeforeRender');
-//       sinon.spy(this.layoutViewManager, 'trigger');
-//       this.layoutViewManager.render();
-//     });
-
-//     it('should find the region scoped within the rendered template', function() {
-//       this.layoutViewManager.regionOne._ensureElement();
-//       var el = this.layoutViewManager.$('#regionOne');
-//       expect(this.layoutViewManager.regionOne.$el[0]).to.equal(el[0]);
-//     });
-
-//     it('should call "onBeforeRender" before rendering', function() {
-//       expect(this.layoutViewManager.onBeforeRender).to.have.been.calledOnce;
-//     });
-
-//     it('should call "onRender" after rendering', function() {
-//       expect(this.layoutViewManager.onRender).to.have.been.calledOnce;
-//     });
-
-//     it('should call "onBeforeRender" before "onRender"', function() {
-//       expect(this.layoutViewManager.onBeforeRender).to.have.been.calledBefore(this.layoutViewManager.onRender);
-//     });
-
-//     it('should not be rendered when "onBeforeRender" is called', function() {
-//       expect(this.layoutViewManager.onBeforeRender.lastCall.returnValue).not.to.be.ok;
-//     });
-
-//     it('should be rendered when "onRender" is called', function() {
-//       expect(this.layoutViewManager.onRender.lastCall.returnValue).to.be.true;
-//     });
-
-//     it('should trigger a "before:render" event', function() {
-//       expect(this.layoutViewManager.trigger).to.have.been.calledWith('before:render', this.layoutViewManager);
-//     });
-
-//     it('should trigger a "render" event', function() {
-//       expect(this.layoutViewManager.trigger).to.have.been.calledWith('render', this.layoutViewManager);
-//     });
-
-//     it('should be marked rendered', function() {
-//       expect(this.layoutViewManager).to.have.property('isRendered', true);
-//     });
-//   });
+  t.end();
+});
 
 //   describe('when destroying', function() {
 //     beforeEach(function() {
