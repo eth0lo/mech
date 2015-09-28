@@ -1,168 +1,95 @@
-// describe('layoutView', function() {
-//   'use strict';
+var test    = require('tape-catch')
+var mech    = require('../src/node');
 
-//   beforeEach(function() {
-//     this.layoutViewManagerTemplateFn = _.template('<div id="regionOne"></div><div id="regionTwo"></div>');
-//     this.template = function() {
-//       return '<span class=".craft"></span><h1 id="#a-fun-game"></h1>';
-//     };
+var helpers = require('./helpers');
 
-//     this.LayoutView = Backbone.Marionette.LayoutView.extend({
-//       template: this.layoutViewManagerTemplateFn,
-//       regions: {
-//         regionOne: '#regionOne',
-//         regionTwo: '#regionTwo'
-//       },
-//       initialize: function() {
-//         if (this.model) {
-//           this.listenTo(this.model, 'change', this.render);
-//         }
-//       },
-//       onBeforeRender: function() {
-//         return this.isRendered;
-//       },
-//       onRender: function() {
-//         return this.isRendered;
-//       }
-//     });
+var View, regionOne, options, view;
+test('on instantiation', function(t){
 
-//     this.CustomRegion1 = function() {};
+  t.test('with regions defined', function(t){
+    View = helpers.ViewWithRegions.extend({
+      initialize: function(){
+        regionOne = this.regionOne;
+      }
+    });
 
-//     this.CustomRegion2 = Backbone.Marionette.Region.extend();
+    view = new View();
 
-//     this.LayoutViewNoDefaultRegion = this.LayoutView.extend({
-//       regions: {
-//         regionOne: {
-//           selector: '#regionOne',
-//           regionClass: this.CustomRegion1
-//         },
-//         regionTwo: '#regionTwo'
-//       }
-//     });
-//   });
+    t.ok(view.regionOne);
+    t.ok(view.regionTwo);
 
-//   describe('on instantiation', function() {
-//     beforeEach(function() {
-//       var suite = this;
-//       this.LayoutViewInitialize = this.LayoutView.extend({
-//         initialize: function() {
-//           suite.regionOne = this.regionOne;
-//         }
-//       });
+    t.deepEqual(regionOne, view.regionOne, 'regions are instantiated before initialize');
+    t.deepEqual(view.regionManager._parent, view, 'should create backlink with region manager');
 
-//       this.layoutViewManager = new this.LayoutViewInitialize();
-//     });
+    t.end();
+  });
 
-//     it('should instantiate the specified region managers', function() {
-//       expect(this.layoutViewManager).to.have.property('regionOne');
-//       expect(this.layoutViewManager).to.have.property('regionTwo');
-//     });
 
-//     it('should instantiate the specified region before initialize', function() {
-//       expect(this.regionOne).to.equal(this.layoutViewManager.regionOne);
-//     });
+  t.test('with no regions defined', function(t){
+    View = mech.View.extend({});
 
-//     it('should create backlink with region manager', function() {
-//       it('should instantiate the specified region managers', function() {
-//         expect(this.layoutViewManager._parent).to.deep.equal(this.layoutViewManager);
-//       });
-//     });
-//   });
+    function createViewWithNoRegions(){
+      view = new View();
+    };
+    t.doesNotThrow(createViewWithNoRegions, 'does not throw');
 
-//   describe('on instantiation with no regions defined', function() {
-//     beforeEach(function() {
-//       var suite = this;
-//       this.NoRegions = Marionette.LayoutView.extend({});
-//       this.init = function() {
-//         suite.layoutViewManager = new suite.NoRegions();
-//       };
-//     });
+    t.end();
+  });
 
-//     it('should instantiate the specified region managers', function() {
-//       expect(this.init).not.to.throw;
-//     });
-//   });
 
-//   describe('on instantiation with custom region managers', function() {
-//     beforeEach(function() {
-//       this.LayoutViewCustomRegion = this.LayoutView.extend({
-//         regionClass: this.CustomRegion1,
-//         regions: {
-//           regionOne: {
-//             selector: '#regionOne',
-//             regionClass: this.CustomRegion1
-//           },
-//           regionTwo: {
-//             selector: '#regionTwo',
-//             regionClass: this.CustomRegion2,
-//             specialOption: true
-//           },
-//           regionThree: {
-//             selector: '#regionThree'
-//           },
-//           regionFour: '#regionFour'
-//         }
-//       });
+  t.test('with custom regions defined', function(t){
+    View = helpers.ViewWithCustomRegions.extend({});
+    view = new View();
 
-//       this.layoutViewManager = new this.LayoutViewCustomRegion();
-//     });
+    t.ok(view.regionOne);
+    t.ok(view.regionOne instanceof helpers.CustomRegion1, 'inline region');
+    t.ok(view.regionTwo);
+    t.ok(view.regionTwo instanceof helpers.CustomRegion2);
 
-//     it('should instantiate specific regions with custom regions if specified', function() {
-//       expect(this.layoutViewManager).to.have.property('regionOne');
-//       expect(this.layoutViewManager.regionOne).to.be.instanceof(this.CustomRegion1);
-//       expect(this.layoutViewManager).to.have.property('regionTwo');
-//       expect(this.layoutViewManager.regionTwo).to.be.instanceof(this.CustomRegion2);
-//     });
+    t.ok(view.regionThree)
+    t.ok(view.regionThree instanceof helpers.CustomRegion1, 'default region');
+    t.ok(view.regionFour)
+    t.ok(view.regionFour instanceof helpers.CustomRegion1);
 
-//     it('should instantiate the default regionManager if specified', function() {
-//       expect(this.layoutViewManager).to.have.property('regionThree');
-//       expect(this.layoutViewManager.regionThree).to.be.instanceof(this.CustomRegion1);
-//       expect(this.layoutViewManager).to.have.property('regionFour');
-//       expect(this.layoutViewManager.regionThree).to.be.instanceof(this.CustomRegion1);
-//     });
+    t.ok(view.regionTwo.options, 'options are passed to the regions');
+    t.ok(view.regionTwo.options.specialOption);
 
-//     it('should instantiate marionette regions is no regionClass is specified', function() {
-//       var layoutViewManagerNoDefault = new this.LayoutViewNoDefaultRegion();
-//       expect(layoutViewManagerNoDefault).to.have.property('regionTwo');
-//       expect(layoutViewManagerNoDefault.regionTwo).to.be.instanceof(Backbone.Marionette.Region);
-//     });
 
-//     it('should pass extra options to the custom regionClass', function() {
-//       expect(this.layoutViewManager.regionTwo).to.have.property('options');
-//       expect(this.layoutViewManager.regionTwo.options).to.have.property('specialOption');
-//       expect(this.layoutViewManager.regionTwo.options.specialOption).to.be.ok;
-//     });
-//   });
+    View = helpers.ViewWithNoDefaultRegion.extend({});
+    view = new View();
 
-//   describe('when regions are defined as a function', function() {
-//     beforeEach(function() {
-//       var suite = this;
-//       this.LayoutView = Marionette.LayoutView.extend({
-//         template: '#foo',
-//         regions: function(opts) {
-//           suite.options = opts;
-//           return {
-//             'foo': '#bar'
-//           };
-//         }
-//       });
+    t.ok(view.regionTwo);
+    t.ok(view.regionTwo instanceof helpers.DefaultRegion, 'default region');
 
-//       this.setFixtures('<div id="foo"><div id="bar"></div></div>');
-//       this.layoutView = new this.LayoutView();
-//       this.layoutView.render();
-//     });
+    t.end();
+  });
 
-//     it('should supply the layoutView.options to the function when calling it', function() {
-//       expect(_.extend({
-//         destroyImmediate: false
-//       }, this.options)).to.deep.equal(this.layoutView.options);
-//     });
 
-//     it('should build the regions from the returns object literal', function() {
-//       expect(this.layoutView).to.have.property('foo');
-//       expect(this.layoutView.foo).to.be.instanceof(Backbone.Marionette.Region);
-//     });
-//   });
+  t.test('when regions are defined as a function', function(t){
+    View = helpers.ViewWithRegions.extend({
+      regions: function(opts){
+        options = opts;
+        return {
+          'regionOne': '#regionOne'
+        };
+      }
+    });
+    view = new View();
+    view.render();
+
+    t.deepEqual(view.options, { destroyImmediate: false }, 'should supply the layoutView.options to the function when calling it');
+    t.ok(view.regionOne);
+    t.ok(view.regionOne instanceof helpers.DefaultRegion);
+
+    t.end();
+  });
+});
+
+test('on rendering', function(t){
+
+});
+
+
 
 //   describe('on rendering', function() {
 //     beforeEach(function() {

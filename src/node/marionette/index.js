@@ -5,3 +5,5 @@ var window       = require('./../window');
 Marionette.isNodeAttached = function(el) {
   return Backbone.$.contains( window.document.documentElement, el);
 };
+
+module.exports = Marionette;
