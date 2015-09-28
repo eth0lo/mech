@@ -1,9 +1,10 @@
 var test    = require('tape-catch')
 var mech    = require('../src/node');
+var $       = mech.Backbone.$;
 var sinon   = require('sinon');
 
 var helpers = require('./helpers');
-var View, regionOne, options, view;
+var View, regionOne, regionTwo, options, view;
 
 test('on instantiation', function(t){
 
@@ -114,85 +115,69 @@ test('on rendering', function(t){
 });
 
 test('when destroying', function(t){
+  var BaseView = helpers.ViewWithRegions,
+      RegionView, regionOneView;
+
+  function setup(viewOptions){
+    view = new BaseView(viewOptions);
+    $('<span id="parent">').append(view.el);
+    view.render();
+
+    regionOne = view.regionOne;
+    regionTwo = view.regionTwo;
+
+    RegionView = mech.View.extend({
+      template: false,
+      destroy: function() {
+        this.hadParent = this.$el.closest('#parent').length > 0;
+        return RegionView.__super__.destroy.call(this);
+      }
+    });
+
+    regionOneView = new RegionView();
+
+    view.regionOne.show(regionOneView);
+
+    sinon.spy(regionOne, 'empty');
+    sinon.spy(regionTwo, 'empty');
+
+    sinon.spy(view, 'destroy');
+
+    view.destroy();
+    view.destroy();
+  }
+
+  setup();
+  t.ok(regionOne.empty.calledOnce, 'should empty the region manager');
+  t.ok(regionTwo.empty.calledOnce, 'should empty the region manager');
+
+
+  t.notOk(view.regionOne, 'should delete the region manager');
+  t.notOk(view.regionTwo, 'should delete the region manager');
+
+  t.ok(view.destroy.alwaysReturned(view), 'should return the view');
+
+  t.ok(view.isDestroyed, 'should be marked destroyed');
+  t.notOk(view.isRendered, 'should be marked not rendered');
+
+  t.ok(regionOneView.hadParent, 'should not remove itself from the DOM before destroying child regions by default');
+
+
+  setup({ destroyImmediate: true });
+  t.false(regionOneView.hadParent, 'should remove itself from the DOM before destroying child regions if flag set via options');
+
+
+  BaseView.prototype.options.destroyImmediate = true;
+  setup();
+  t.false(regionOneView.hadParent, 'should remove itself from the DOM before destroying child regions if flag set on proto options');
+
+  BaseView.prototype.options = null;
+  BaseView.prototype.destroyImmediate = true;
+  setup();
+  t.false(regionOneView.hadParent, 'should remove itself from the DOM before destroying child regions if flag set on proto');
 
   t.end();
 });
-
-//   describe('when destroying', function() {
-//     beforeEach(function() {
-//       this.layoutViewManager = new this.LayoutView(this.viewOptions);
-//       $('<span id="parent">').append(this.layoutViewManager.el);
-//       this.layoutViewManager.render();
-
-//       this.regionOne = this.layoutViewManager.regionOne;
-//       this.regionTwo = this.layoutViewManager.regionTwo;
-
-//       var View = Marionette.ItemView.extend({
-//         template: false,
-//         destroy: function() {
-//           this.hadParent = this.$el.closest('#parent').length > 0;
-//           return View.__super__.destroy.call(this);
-//         }
-//       });
-
-//       this.regionOneView = new View();
-//       this.regionOne.show(this.regionOneView);
-
-//       this.sinon.spy(this.regionOne, 'empty');
-//       this.sinon.spy(this.regionTwo, 'empty');
-
-//       this.sinon.spy(this.layoutViewManager, 'destroy');
-//       this.layoutViewManager.destroy();
-//       this.layoutViewManager.destroy();
-//     });
-
-//     it('should empty the region managers', function() {
-//       expect(this.regionOne.empty).to.have.been.calledOnce;
-//       expect(this.regionTwo.empty).to.have.been.calledOnce;
-//     });
-
-//     it('should delete the region managers', function() {
-//       expect(this.layoutViewManager.regionOne).to.be.undefined;
-//       expect(this.layoutViewManager.regionTwo).to.be.undefined;
-//     });
-
-//     it('should return the view', function() {
-//       expect(this.layoutViewManager.destroy).to.have.always.returned(this.layoutViewManager);
-//     });
-
-//     it('should not remove itself from the DOM before destroying child regions by default', function() {
-//       expect(this.regionOneView.hadParent).to.be.true;
-//       this.viewOptions = {
-//         destroyImmediate: true
-//       };
-//     });
-
-//     it('should remove itself from the DOM before destroying child regions if flag set via options', function() {
-//       expect(this.regionOneView.hadParent).to.be.false;
-//       this.viewOptions = null;
-//       this.LayoutView.prototype.options.destroyImmediate = true;
-//     });
-
-//     it('should remove itself from the DOM before destroying child regions if flag set on proto options', function() {
-//       expect(this.regionOneView.hadParent).to.be.false;
-//       _.extend(this.LayoutView.prototype, {
-//         options: null,
-//         destroyImmediate: true
-//       });
-//     });
-
-//     it('should remove itself from the DOM before destroying child regions if flag set on proto', function() {
-//       expect(this.regionOneView.hadParent).to.be.false;
-//     });
-
-//     it('should be marked destroyed', function() {
-//       expect(this.layoutViewManager).to.have.property('isDestroyed', true);
-//     });
-
-//     it('should be marked not rendered', function() {
-//       expect(this.layoutViewManager).to.have.property('isRendered', false);
-//     });
-//   });
 
 //   describe('when showing a childView', function() {
 //     beforeEach(function() {
