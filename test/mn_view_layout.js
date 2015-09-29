@@ -1,10 +1,11 @@
 var test    = require('tape-catch')
 var mech    = require('../src/node');
 var $       = mech.Backbone.$;
+var _       = require('underscore');
 var sinon   = require('sinon');
 
 var helpers = require('./helpers');
-var View, regionOne, regionTwo, options, view;
+var View, region, regionOne, regionTwo, options, view;
 
 test('on instantiation', function(t){
 
@@ -87,9 +88,9 @@ test('on instantiation', function(t){
   });
 });
 
+
 test('on rendering', function(t){
-  View = helpers.ViewWithRegions.extend({});
-  view = new View();
+  view = new helpers.ViewWithRegions();
 
   sinon.spy(view, 'onRender');
   sinon.spy(view, 'onBeforeRender');
@@ -113,6 +114,7 @@ test('on rendering', function(t){
 
   t.end();
 });
+
 
 test('when destroying', function(t){
   var BaseView = helpers.ViewWithRegions,
@@ -151,7 +153,6 @@ test('when destroying', function(t){
   t.ok(regionOne.empty.calledOnce, 'should empty the region manager');
   t.ok(regionTwo.empty.calledOnce, 'should empty the region manager');
 
-
   t.notOk(view.regionOne, 'should delete the region manager');
   t.notOk(view.regionTwo, 'should delete the region manager');
 
@@ -179,376 +180,331 @@ test('when destroying', function(t){
   t.end();
 });
 
-//   describe('when showing a childView', function() {
-//     beforeEach(function() {
-//       this.layoutView = new this.LayoutView();
-//       this.layoutView.render();
-//       this.childView = new Backbone.View();
-//       this.layoutView.showChildView('regionOne', this.childView);
-//     });
+test('when showing a childview', function(t){
+  view = new helpers.ViewWithRegions();
+  regionView = new mech.View({template: false});
 
-//     it('shows the childview in the region', function() {
-//       expect(this.layoutView.getChildView('regionOne')).to.equal(this.childView);
-//     });
-//   });
+  view.render();
+  view.showChildView('regionOne', regionView);
 
-//   describe('when showing a layoutView via a region', function() {
-//     beforeEach(function() {
-//       var suite = this;
+  t.deepEqual(view.getChildView('regionOne'), regionView);
+  t.end();
+});
 
-//       this.setFixtures('<div id="mgr"></div>');
+test('when showing a layoutView via a region', function(t){
+  var fixture = $('<div id="mgr"></div>');
+  helpers.document.body.appendChild(fixture[0]);
 
-//       this.layoutView = new this.LayoutView();
-//       this.layoutView.onRender = function() {
-//         suite.regionOne = suite.layoutView.regionOne;
-//         suite.regionOne._ensureElement();
-//       };
+  view = new helpers.ViewWithRegions();
+  view.onRender = function(){
+    regionOne = view.regionOne;
+    regionOne._ensureElement();
+  }
 
-//       this.region = new Backbone.Marionette.Region({
-//         el: '#mgr'
-//       });
+  region = new mech.Marionette.Region({
+    el: '#mgr'
+  });
 
-//       this.showReturn = this.region.show(this.layoutView);
-//     });
+  var exampleRegion = region.show(view);
 
-//     it('should make the regions available in `onRender`', function() {
-//       expect(this.regionOne).to.exist;
-//     });
+  t.ok(regionOne, 'should make the regions available in `onRender');
+  t.equal(regionOne.$el.length, 1, 'the regions should find their elements in `onRender`');
+  t.deepEqual(exampleRegion, region, 'should return the region after showing a view in a region');
 
-//     it('the regions should find their elements in `onRender`', function() {
-//       expect(this.regionOne.$el.length).to.equal(1);
-//     });
+  t.end();
+  helpers.document.body.removeChild(fixture[0]);
+});
 
-//     it('should return the region after showing a view in a region', function() {
-//       expect(this.showReturn).to.equal(this.region);
-//     });
-//   });
 
-//   describe('when re-rendering an already rendered layoutView', function() {
-//     beforeEach(function() {
-//       this.LayoutViewBoundRender = this.LayoutView.extend({
-//         initialize: function() {
-//           if (this.model) {
-//             this.listenTo(this.model, 'change', this.render);
-//           }
-//         }
-//       });
+test('when re-rendering an already rendered layoutView', function(t){
+  var View = helpers.ViewWithRegions.extend({
+    initialize: function() {
+      if (this.model) {
+        this.listenTo(this.model, 'change', this.render);
+      }
+    }
+  });
 
-//       this.layoutView = new this.LayoutViewBoundRender({
-//         model: new Backbone.Model()
-//       });
-//       this.sinon.spy(this.layoutView.regionOne, 'empty');
-//       this.layoutView.render();
+  view = new View({
+    model: new mech.Backbone.Model()
+  });
 
-//       this.view = new Backbone.View();
-//       this.view.destroy = function() {};
-//       this.layoutView.regionOne.show(this.view);
+  sinon.spy(view.regionOne, 'empty');
+  view.render();
 
-//       this.layoutView.render();
-//       this.layoutView.regionOne.show(this.view);
-//       this.region = this.layoutView.regionOne;
-//     });
+  regionView = new mech.View({template: false});
+  regionView.destroy = function() {};
+  view.regionOne.show(regionView);
 
-//     it('should re-bind the regions to the newly rendered elements', function() {
-//       expect(this.region.$el.parent()[0]).to.equal(this.layoutView.el);
-//     });
+  view.render();
+  view.regionOne.show(regionView);
+  region = view.regionOne;
 
-//     it('should call empty twice', function() {
-//       expect(this.region.empty).to.have.been.calledThrice;
-//     });
+  t.deepEqual(region.$el.parent()[0], view.el, 'should re-bind the regions to the newly rendered elements');
+  t.ok(region.empty.calledThrice, 'should call empty twice');
 
-//     describe('and the views "render" function is bound to an event in the "initialize" function', function() {
-//       beforeEach(function() {
-//         var suite = this;
-//         this.layoutView.onRender = function() {
-//           this.regionOne.show(suite.view);
-//         };
+  view.onRender = function() {
+    this.regionOne.show(regionView);
+  };
+  view.model.trigger('change');
 
-//         this.layoutView.model.trigger('change');
-//       });
+  t.ok(view.$('#regionOne'));
 
-//       it('should re-bind the regions correctly', function() {
-//         expect(this.layoutView.$('#regionOne')).not.to.equal();
-//       });
-//     });
-//   });
+  t.end();
+});
 
-//   describe('when re-rendering a destroyed layoutView', function() {
-//     beforeEach(function() {
-//       this.layoutView = new this.LayoutView();
-//       this.layoutView.render();
-//       this.region = this.layoutView.regionOne;
+test('when re-rendering a destroyed layoutView', function(t) {
+  view = new helpers.ViewWithRegions();
+  view.render();
+  region = view.regionOne;
 
-//       this.view = new Backbone.View();
-//       this.view.destroy = function() {};
-//       this.layoutView.regionOne.show(this.view);
-//       this.layoutView.destroy();
+  regionView = new mech.View({template: false});
+  regionView.destroy = function() {};
 
-//       this.sinon.spy(this.region, 'empty');
-//       this.sinon.spy(this.view, 'destroy');
+  view.regionOne.show(regionView);
+  view.destroy();
 
-//       this.layoutView.onBeforeRender = this.sinon.stub();
-//       this.layoutView.onRender = this.sinon.stub();
-//     });
+  sinon.spy(region, 'empty');
+  sinon.spy(regionView, 'destroy');
 
-//     it('should throw an error', function() {
-//       expect(this.layoutView.render).to.throw('View (cid: "' + this.layoutView.cid +
-//           '") has already been destroyed and cannot be used.');
-//     });
-//   });
+  view.onBeforeRender = sinon.stub();
+  view.onRender = sinon.stub();
 
-//   describe('has a valid inheritance chain back to Marionette.View', function() {
-//     beforeEach(function() {
-//       this.constructor = this.sinon.spy(Marionette, 'View');
-//       this.layoutView = new Marionette.LayoutView();
-//     });
+  t.throws(view.render, 'View (cid: "' + view.cid + '") has already been destroyed and cannot be used.',
+    'should throw an error');
 
-//     it('calls the parent Marionette.Views constructor function on instantiation', function() {
-//       expect(this.constructor).to.have.been.called;
-//     });
-//   });
+  t.end();
+});
 
-//   describe('when getting a region', function() {
-//     beforeEach(function() {
-//       this.layoutView = new this.LayoutView();
-//       this.region = this.layoutView.regionOne;
-//     });
 
-//     it('should return the region', function() {
-//       expect(this.layoutView.getRegion('regionOne')).to.equal(this.region);
-//     });
-//   });
+test('has a valid inheritance chain back to Marionette.View', function(t) {
+  var constructor = sinon.spy(mech.Marionette, 'View');
+  view = new helpers.ViewWithRegions();
 
-//   describe('when adding regions in a layoutViews options', function() {
-//     beforeEach(function() {
-//       var suite = this;
+  t.ok(constructor.called);
+  t.end();
+});
 
-//       this.CustomRegion = this.sinon.spy();
-//       this.regionOptions = {
-//         war: '.craft',
-//         is: {
-//           regionClass: this.CustomRegion,
-//           selector: '#a-fun-game'
-//         }
-//       };
 
-//       this.layoutView = new Backbone.Marionette.LayoutView({
-//         template: this.template,
-//         regions: this.regionOptions
-//       });
+test('when getting a region', function(t) {
+  view = new helpers.ViewWithRegions();
+  regionOne = view.regionOne;
 
-//       this.layoutView2 = new Backbone.Marionette.LayoutView({
-//         template: this.template,
-//         regions: function() {
-//           return suite.regionOptions;
-//         }
-//       });
-//     });
+  t.deepEqual(view.getRegion('regionOne'), regionOne);
+  t.end();
+});
 
-//     it('should lookup and set the regions', function() {
-//       expect(this.layoutView.getRegion('is')).to.exist;
-//       expect(this.layoutView.getRegion('war')).to.exist;
-//     });
 
-//     it('should lookup and set the regions when passed a function', function() {
-//       expect(this.layoutView2.getRegion('is')).to.exist;
-//       expect(this.layoutView2.getRegion('war')).to.exist;
-//     });
+test('when adding regions in a layoutViews options', function(t) {
+  Region = sinon.spy();
 
-//     it('should set custom region classes', function() {
-//       expect(this.CustomRegion).to.have.been.called;
-//     });
-//   });
+  options = {
+    war: '.craft',
+    is: {
+      regionClass: Region,
+      selector: '#a-fun-game'
+    }
+  }
 
-//   describe('when defining region selectors using @ui. syntax', function() {
-//     beforeEach(function() {
-//       var UILayoutView = Backbone.Marionette.LayoutView.extend({
-//         template: this.template,
-//         regions: {
-//           war: '@ui.war',
-//           mario: {
-//             selector: '@ui.mario'
-//           },
-//           princess: {
-//             el: '@ui.princess'
-//           }
-//         },
-//         ui: {
-//           war: '.craft',
-//           mario: '.bros',
-//           princess: '.toadstool'
-//         }
-//       });
-//       this.layoutView = new UILayoutView();
-//     });
+  view = new mech.View({
+    template: helpers.template,
+    regions: options
+  });
 
-//     it('should apply the relevant @ui. syntax selector to a simple string value', function() {
-//       expect(this.layoutView.getRegion('war')).to.exist;
-//       expect(this.layoutView.getRegion('war').$el.selector).to.equal('.craft');
-//     });
-//     it('should apply the relevant @ui. syntax selector to selector in a region definition object', function() {
-//       expect(this.layoutView.getRegion('mario')).to.exist;
-//       expect(this.layoutView.getRegion('mario').$el.selector).to.equal('.bros');
-//     });
-//     it('should apply the relevant @ui. syntax selector to el in a region definition object', function() {
-//       expect(this.layoutView.getRegion('princess')).to.exist;
-//       expect(this.layoutView.getRegion('princess').$el.selector).to.equal('.toadstool');
-//     });
-//   });
+  t.ok(view.getRegion('is'), 'should lookup and set the regions');
+  t.ok(view.getRegion('war'), 'should lookup and set the regions');
 
-//   describe('overiding default regionManager', function() {
-//     beforeEach(function() {
-//       var suite = this;
-//       this.spy     = this.sinon.spy();
-//       this.layout  = new (Marionette.LayoutView.extend({
-//         getRegionManager: function() {
-//           suite.spy.apply(this, arguments);
-//           return new Marionette.RegionManager();
-//         }
-//       }))();
-//     });
+  view = new mech.View({
+    template: helpers.template,
+    regions: function() {
+      return options;
+    }
+  });
 
-//     it('should call into the custom regionManager lookup', function() {
-//       expect(this.spy).to.have.been.called;
-//     });
+  t.ok(view.getRegion('is'), 'should lookup and set the regions when passed a function');
+  t.ok(view.getRegion('war'), 'should lookup and set the regions when passed a function');
 
-//     it('should call the custom regionManager with the view as the context', function() {
-//       expect(this.spy).to.have.been.calledOn(this.layout);
-//     });
-//   });
+  t.ok(Region.called, 'should set custom region classes');
 
-//   describe('childView get onDomRefresh from parent', function() {
-//     beforeEach(function() {
-//       var suite = this;
-//       this.setFixtures('<div id="james-kyle"></div>');
-//       this.spy = this.sinon.spy();
-//       this.spy2 = this.sinon.spy();
+  t.end();
+});
 
-//       this.ItemView = Marionette.ItemView.extend({
-//         template: _.template('<yes><my><lord></lord></my></yes>'),
-//         onDomRefresh: this.spy2
-//       });
 
-//       this.LucasArts = Marionette.CollectionView.extend({
-//         onDomRefresh: this.spy,
-//         childView: this.ItemView
-//       });
+test('when defining region selectors using @ui. syntax', function(t) {
+  View = mech.View.extend({
+    template: helpers.template,
+    regions: {
+      war: '@ui.war',
+      mario: {
+        selector: '@ui.mario'
+      },
+      princess: {
+        el: '@ui.princess'
+      }
+    },
+    ui: {
+      war: '.craft',
+      mario: '.bros',
+      princess: '.toadstool'
+    }
+  });
 
-//       this.Layout = Marionette.LayoutView.extend({
-//         template: _.template('<sam class="and-max"></sam>'),
-//         regions: {
-//           'sam': '.and-max'
-//         },
+  view = new View();
 
-//         onShow: function() {
-//           this.getRegion('sam').show(new suite.LucasArts({collection: new Backbone.Collection([{}])}));
-//         }
-//       });
+  t.ok(view.getRegion('war'), 'should apply the relevant @ui. syntax selector to a simple string value');
+  t.equal(view.getRegion('war').$el.selector, '.craft');
 
-//       this.region = new Marionette.Region({el: '#james-kyle'});
+  t.ok(view.getRegion('mario'), 'should apply the relevant @ui. syntax selector to a simple string value');
+  t.equal(view.getRegion('mario').$el.selector, '.bros');
 
-//       this.region.show(new this.Layout());
-//     });
+  t.ok(view.getRegion('princess'), 'should apply the relevant @ui. syntax selector to a simple string value');
+  t.equal(view.getRegion('princess').$el.selector, '.toadstool');
 
-//     it('should call onDomRefresh on region views when shown within the parents onShow', function() {
-//       expect(this.spy).to.have.been.called;
-//     });
+  t.end();
+});
 
-//     it('should call onDomRefresh on region view children when shown within the parents onShow', function() {
-//       expect(this.spy2).to.have.been.called;
-//     });
-//   });
 
-//   describe('when a layout has regions', function() {
-//     beforeEach(function() {
-//       this.layout = new this.LayoutView();
-//       this.layout.render();
-//       this.regions = this.layout.getRegions();
-//     });
+test('overiding default regionManager', function(t) {
+  var customRegionManager = sinon.spy();
 
-//     it('should be able to retrieve all regions', function() {
-//       expect(this.regions.regionOne).to.equal(this.layout.getRegion('regionOne'));
-//       expect(this.regions.regionTwo).to.equal(this.layout.getRegion('regionTwo'));
-//     });
+  View = mech.View.extend({
+    getRegionManager: function() {
+      customRegionManager.apply(this, arguments);
+      return new mech.Marionette.RegionManager();
+    }
+  });
 
-//     describe('when the regions are specified via regions hash and the view has no template', function() {
-//       beforeEach(function() {
-//         var fixture =
-//           '<div class="region-hash-no-template-spec">' +
-//             '<div class="region-one">Out-of-scope region</div>' +
-//             '<div class="some-layout-view">' +
-//               '<div class="region-one">In-scope region</div>' +
-//             '</div>' +
-//           '</div>';
-//         this.setFixtures(fixture);
-//         this.LayoutView = Backbone.Marionette.LayoutView.extend({
-//           el: '.region-hash-no-template-spec .some-layout-view',
-//           template: false,
-//           regions: {
-//             regionOne: '.region-one'
-//           }
-//         });
-//         this.layoutViewInstance = new this.LayoutView();
-//         this.layoutViewInstance.render();
-//         var $specNode = $('.region-hash-no-template-spec');
-//         this.$inScopeRegion =  $specNode.find('.some-layout-view .region-one');
-//         this.$outOfScopeRegion = $specNode.children('.region-one');
-//       });
+  view = new View();
 
-//       it('after initialization, the view\'s regions should be scoped to its parent view', function() {
-//         expect(this.layoutViewInstance.regionOne.$el).to.have.length(1);
-//         expect(this.layoutViewInstance.regionOne.$el.is(this.$inScopeRegion)).to.equal(true);
-//         expect(this.layoutViewInstance.regionOne.$el.is(this.$outOfScopeRegion)).to.equal(false);
-//       });
-//     });
-//   });
+  t.ok(customRegionManager.called, 'should call into the custom regionManager lookup');
+  t.ok(customRegionManager.calledOn(view), 'should call into the custom regionManager lookup');
 
-//   describe('manipulating regions', function() {
-//     beforeEach(function() {
-//       this.beforeAddRegionSpy = this.sinon.spy();
-//       this.addRegionSpy = this.sinon.spy();
-//       this.beforeRegionRemoveSpy = this.sinon.spy();
-//       this.removeRegionSpy = this.sinon.spy();
+  t.end();
+});
 
-//       this.Layout = Marionette.LayoutView.extend({
-//         template: false,
-//         onBeforeAddRegion: this.beforeAddRegionSpy,
-//         onAddRegion: this.addRegionSpy,
-//         onBeforeRemoveRegion: this.beforeRegionRemoveSpy,
-//         onRemoveRegion: this.removeRegionSpy
-//       });
 
-//       this.layout = new this.Layout();
+ test('childView get onDomRefresh from parent', function(t) {
+  var fixture = $('<div id="james-kyle"></div>');
+  helpers.document.body.appendChild(fixture[0]);
+  var spy = sinon.spy();
+  var spy2 = sinon.spy();
 
-//       this.regionName = 'myRegion';
-//       this.layout.addRegion(this.regionName, '.region-selector');
-//     });
+  var ItemView = mech.View.extend({
+    template: _.template('<yes><my><lord></lord></my></yes>'),
+    onDomRefresh: spy2
+  });
 
-//     it('should trigger correct region add events', function() {
-//       expect(this.beforeAddRegionSpy)
-//         .to.have.been.calledOnce
-//         .and.calledOn(this.layout)
-//         .and.calledWith(this.regionName);
+  var LucasArts = mech.CollectionView.extend({
+    onDomRefresh: spy,
+    childView: ItemView
+  });
 
-//       expect(this.addRegionSpy)
-//         .to.have.been.calledOnce
-//         .and.calledOn(this.layout)
-//         .and.calledWith(this.regionName);
-//     });
+  View = mech.View.extend({
+    template: _.template('<sam class="and-max"></sam>'),
+    regions: {
+      'sam': '.and-max'
+    },
 
-//     it('should trigger correct region remove events', function() {
-//       this.layout.removeRegion(this.regionName);
+    onShow: function() {
+      var collection = new mech.Backbone.Collection([{}]);
+      this.getRegion('sam').show(new LucasArts({collection: collection}));
+    }
+  });
+  view = new View();
 
-//       expect(this.beforeRegionRemoveSpy)
-//         .to.have.been.calledOnce
-//         .and.calledOn(this.layout)
-//         .and.calledWith(this.regionName);
+  region = new mech.Marionette.Region({el: '#james-kyle'});
+  region.show(view);
 
-//       expect(this.removeRegionSpy)
-//         .to.have.been.calledOnce
-//         .and.calledOn(this.layout)
-//         .and.calledWith(this.regionName);
-//     });
-//   });
+  t.ok(spy.called, 'should call onDomRefresh on region views when shown within the parents onShow');
+  t.ok(spy2.called, 'should call onDomRefresh on region view children when shown within the parents onShow');
 
-// });
+  t.end();
+  helpers.document.body.removeChild(fixture[0]);
+ });
+
+
+test('when a layout has regions', function(t) {
+  view = new helpers.ViewWithRegions();
+  view.render();
+  regions = view.getRegions();
+
+  t.deepEqual(regions.regionOne, view.getRegion('regionOne'), 'should be able to retrieve all regions');
+  t.deepEqual(regions.regionTwo, view.getRegion('regionTwo'));
+
+  t.test('when the regions are specified via regions hash and the view has no template', function(t) {
+    var fixture = $(
+      '<div class="region-hash-no-template-spec">' +
+        '<div class="region-one">Out-of-scope region</div>' +
+        '<div class="some-layout-view">' +
+          '<div class="region-one">In-scope region</div>' +
+        '</div>' +
+      '</div>'
+    );
+    helpers.document.body.appendChild(fixture[0]);
+
+    View = mech.View.extend({
+      el: '.region-hash-no-template-spec .some-layout-view',
+      template: false,
+      regions: {
+        regionOne: '.region-one'
+      }
+    });
+
+    view = new View();
+    view.render();
+
+    var $specNode = $('.region-hash-no-template-spec');
+    var $inScopeRegion =  $specNode.find('.some-layout-view .region-one');
+    var $outOfScopeRegion = $specNode.children('.region-one');
+
+    t.equal(view.regionOne.$el.length, 1, 'after initialization, the view\'s regions should be scoped to its parent view');
+
+    t.equal(view.regionOne.$el.is($inScopeRegion), true);
+    t.equal(view.regionOne.$el.is($outOfScopeRegion), false);
+
+    t.end();
+    helpers.document.body.removeChild(fixture[0]);
+  });
+
+  t.end();
+});
+
+
+test('manipulating regions', function(t) {
+  var beforeAddRegionSpy = sinon.spy();
+  var addRegionSpy = sinon.spy();
+  var beforeRegionRemoveSpy = sinon.spy();
+  var removeRegionSpy = sinon.spy();
+
+  View = mech.View.extend({
+    template: false,
+    onBeforeAddRegion: beforeAddRegionSpy,
+    onAddRegion: addRegionSpy,
+    onBeforeRemoveRegion: beforeRegionRemoveSpy,
+    onRemoveRegion: removeRegionSpy
+  });
+
+  view = new View();
+  regionName = 'myRegion';
+  view.addRegion(regionName, '.region-selector');
+
+  t.ok(beforeAddRegionSpy.calledOnce);
+  t.ok(beforeAddRegionSpy.calledOn(view));
+  t.ok(beforeAddRegionSpy.calledWith(regionName));
+
+  t.ok(addRegionSpy.calledOnce);
+  t.ok(addRegionSpy.calledOn(view));
+  t.ok(addRegionSpy.calledWith(regionName));
+
+  view.removeRegion(regionName);
+
+  t.ok(beforeRegionRemoveSpy.calledOnce);
+  t.ok(beforeRegionRemoveSpy.calledOn(view));
+  t.ok(beforeRegionRemoveSpy.calledWith(regionName));
+
+  t.ok(removeRegionSpy.calledOnce);
+  t.ok(removeRegionSpy.calledOn(view));
+  t.ok(removeRegionSpy.calledWith(regionName));
+
+  t.end();
+});

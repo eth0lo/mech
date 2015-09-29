@@ -6,6 +6,8 @@ var doc      = window.document;
 var div      = doc.createElement('div');
 var h1       = doc.createElement('h1');
 
+module.exports.document = doc;
+
 //////////////////////
 // Backbone Helpers //
 //////////////////////
