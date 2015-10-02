@@ -1,5 +1,6 @@
 var test       = require('tape-catch');
-var proxyquire = require('proxyquire');
+var proxyquire = require('proxyquire').noPreserveCache();
+var nock       = require('nock');
 var sinon      = require('sinon');
 
 var httpStub   = {
@@ -10,11 +11,11 @@ var httpStub   = {
   }
 };
 var httpsStub  = httpStub;
-var transport  = proxyquire('../src/node/backbone/transport', {http: httpStub, https: httpsStub});
 
 test('jQuery ajax transport', function(t) {
 
   t.test('complies with jQuery interface', function(t) {
+    var transport  = proxyquire('../src/node/backbone/transport', {http: httpStub, https: httpsStub});
     var example = transport({url: 'https://sample.com', type: 'get'});
 
     t.ok(example.send);
@@ -24,7 +25,9 @@ test('jQuery ajax transport', function(t) {
     t.end();
   });
 
+
   t.test('making simple requests', function(t) {
+    var transport  = proxyquire('../src/node/backbone/transport', {http: httpStub, https: httpsStub});
     var request = transport({url: 'https://sample.com', type: 'get'});
     var httpsRequest = sinon.spy(httpsStub, 'request');
 
@@ -47,6 +50,24 @@ test('jQuery ajax transport', function(t) {
     t.end();
   });
 
+
+  t.test('reciving data', function(t) {
+    nock('https://sample.com')
+      .get('/')
+      .reply(200, {hello: 'world'});
+
+    var transport  = require('../src/node/backbone/transport');
+    var request = transport({url: 'https://sample.com', type: 'get'});
+
+    request.send({}, function(statusCode, statusMessage, data, headers){
+      t.equal(statusCode, 200);
+      t.equal(statusMessage, null);
+      t.deepEqual(data, {text:'{"hello":"world"}'});
+      t.deepEqual(headers, {'content-type': 'application/json'});
+
+      t.end();
+    });
+  });
 
   t.end();
 });
