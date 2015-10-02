@@ -1,7 +1,7 @@
 var test    = require('tape-catch')
 var mech    = require('../src/node');
 
-var helpers = require('./helpers');
+var helpers = require('./bb_helpers');
 var doc     = mech.window.document;
 var $       = mech.Backbone.$;
 

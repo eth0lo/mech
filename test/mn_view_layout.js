@@ -4,7 +4,7 @@ var $       = mech.Backbone.$;
 var _       = require('underscore');
 var sinon   = require('sinon');
 
-var helpers = require('./helpers');
+var helpers = require('./mn_helpers');
 var View, region, regionOne, regionTwo, options, view;
 
 test('on instantiation', function(t){
