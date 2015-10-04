@@ -61,7 +61,7 @@ test('jQuery ajax transport', function(t) {
 
     request.send({}, function(statusCode, statusMessage, data, headers){
       t.equal(statusCode, 200);
-      t.equal(statusMessage, null);
+      t.equal(statusMessage, undefined);
       t.deepEqual(data, {text:'{"hello":"world"}'});
       t.deepEqual(headers, {'content-type': 'application/json'});
 
