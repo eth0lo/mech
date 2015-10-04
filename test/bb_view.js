@@ -1,4 +1,4 @@
-var test    = require('tape-catch')
+var test    = require('tape-catch');
 var mech    = require('../src/node');
 
 var helpers = require('./bb_helpers');

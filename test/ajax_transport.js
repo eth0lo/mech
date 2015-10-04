@@ -6,7 +6,7 @@ var sinon      = require('sinon');
 var httpStub   = {
   request: function() {
     return {
-      end: function(){}
+      end: function() {}
     }
   }
 };
