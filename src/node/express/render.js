@@ -3,7 +3,7 @@ var path = require('path');
 module.exports = function(options) {
   options = options || {};
 
-  var defaultLayout = options.defaultLayout || 'layout/default';
+  var defaultLayout = options.defaultLayout || 'layouts/default';
 
   return function(req, res, next) {
     var viewRootPath  = req.app.get('views');
