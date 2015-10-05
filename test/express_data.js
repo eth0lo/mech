@@ -4,9 +4,7 @@ var sinon   = require('sinon');
 var nock    = require('nock');
 
 var mech    = require('../src/node');
-
 var express = require('express');
-var Router  = express.Router;
 
 test('appData is present on req and res objects', function(t){
   var app = express();

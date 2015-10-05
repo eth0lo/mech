@@ -25,6 +25,7 @@
   "devDependencies": {
     "backbone": "^1.2.1",
     "express": "^4.13.3",
+    "jade": "^1.11.0",
     "jquery": "^2.1.4",
     "nock": "^2.13.0",
     "proxyquire": "^1.7.2",
