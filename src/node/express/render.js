@@ -28,7 +28,7 @@ module.exports = function(options) {
     }
 
 
-    res.render = function(viewPath, options) {
+    res.render = function(viewPath, options, cb) {
       var mechViewPath = path.resolve(viewRootPath, viewPath);
       var View = require(mechViewPath);
       var view = new View(options);
@@ -41,8 +41,11 @@ module.exports = function(options) {
       renderOptions.bootstrap = bootstrapData(view, {});
 
 
-
-      oldRender.call(res, defaultLayout, renderOptions);
+      var args = [defaultLayout, renderOptions];
+      if(cb) {
+        args.push(cb);
+      }
+      oldRender.apply(res, args);
     }
     next();
   }
