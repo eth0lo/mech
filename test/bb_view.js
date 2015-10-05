@@ -50,7 +50,7 @@ test("initialize", function(t) {
 
 test("render", function(t) {
   // This test have been modified to pass marionette's restrictions on templates
-  var view = new mech.View({template:'<p><a><b>test</b></a></p>'});
+  var view = new mech.View({template: function(){ return '<p><a><b>test</b></a></p>'; }});
   t.equal(view.render(), view, '#render returns the view instance');
 
   t.end();
