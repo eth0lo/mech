@@ -7,7 +7,9 @@
     "./src/node": "./src/client"
   },
   "scripts": {
-    "test": "tape test/node/*.js | tap-dot"
+    "test:node": "tape test/node/*.js | tap-dot",
+    "test:client": "browserify test/client/*.js | tape-run | tap-dot",
+    "test": "npm run test:node && npm run test:client"
   },
   "author": "Jean Carlos Meninno",
   "license": "MIT",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "backbone": "^1.2.1",
+    "browserify": "^12.0.1",
     "express": "^4.13.3",
     "jade": "^1.11.0",
     "jquery": "^2.1.4",
@@ -32,6 +35,7 @@
     "sinon": "^1.17.1",
     "supertest": "^1.1.0",
     "tap-dot": "^1.0.0",
-    "tape": "^4.0.0"
+    "tape": "^4.0.0",
+    "tape-run": "^1.1.0"
   }
 }

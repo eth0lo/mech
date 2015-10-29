@@ -1,4 +1,4 @@
-var mech = require('../../../src/node');
+var mech = require('../../../../src/node');
 
 var Layout = mech.View.extend({
   template: 'layout',

@@ -3,7 +3,7 @@ var Marionette = require('backbone.marionette');
 var jade       = require('jade');
 
 var settings = {
-  views: './test/fixtures/views/'
+  views: './test/node/fixtures/views/'
 }
 module.exports.settings = settings;
 
