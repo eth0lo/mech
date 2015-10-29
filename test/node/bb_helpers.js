@@ -1,5 +1,5 @@
 var _        = require('underscore');
-var mech     = require('../src/node');
+var mech     = require('../../src/node');
 
 var window   = mech.window;
 var doc      = window.document;

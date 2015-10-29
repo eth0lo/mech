@@ -3,7 +3,7 @@ var request = require('supertest');
 var sinon   = require('sinon');
 var nock    = require('nock');
 
-var mech    = require('../src/node');
+var mech    = require('../../src/node');
 var helpers = require('./express_helpers');
 var express = require('express');
 

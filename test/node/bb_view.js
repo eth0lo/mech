@@ -1,5 +1,5 @@
 var test    = require('tape-catch');
-var mech    = require('../src/node');
+var mech    = require('../../src/node');
 
 var helpers = require('./bb_helpers');
 var doc     = mech.window.document;

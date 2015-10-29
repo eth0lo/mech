@@ -2,7 +2,7 @@ var test  = require('tape-catch');
 var sinon = require('sinon');
 var nock  = require('nock');
 
-var mech  = require('../src/node');
+var mech  = require('../../src/node');
 
 test('#raw', function(t) {
   var ModelOne = mech.Model.extend({

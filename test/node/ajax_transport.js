@@ -15,7 +15,7 @@ var httpsStub  = httpStub;
 test('jQuery ajax transport', function(t) {
 
   t.test('complies with jQuery interface', function(t) {
-    var transport  = proxyquire('../src/node/backbone/transport', {http: httpStub, https: httpsStub});
+    var transport  = proxyquire('../../src/node/backbone/transport', {http: httpStub, https: httpsStub});
     var example = transport({url: 'https://sample.com', type: 'get'});
 
     t.ok(example.send);
@@ -27,7 +27,7 @@ test('jQuery ajax transport', function(t) {
 
 
   t.test('making simple requests', function(t) {
-    var transport  = proxyquire('../src/node/backbone/transport', {http: httpStub, https: httpsStub});
+    var transport  = proxyquire('../../src/node/backbone/transport', {http: httpStub, https: httpsStub});
     var request = transport({url: 'https://sample.com', type: 'get'});
     var httpsRequest = sinon.spy(httpsStub, 'request');
 
@@ -56,7 +56,7 @@ test('jQuery ajax transport', function(t) {
       .get('/')
       .reply(200, {hello: 'world'});
 
-    var transport  = require('../src/node/backbone/transport');
+    var transport  = require('../../src/node/backbone/transport');
     var request = transport({url: 'https://sample.com', type: 'get'});
 
     request.send({}, function(statusCode, statusMessage, data, headers){

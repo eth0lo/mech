@@ -7,7 +7,7 @@
     "./src/node": "./src/client"
   },
   "scripts": {
-    "test": "tape test/*.js | tap-dot"
+    "test": "tape test/node/*.js | tap-dot"
   },
   "author": "Jean Carlos Meninno",
   "license": "MIT",

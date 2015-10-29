@@ -1,5 +1,5 @@
 var test    = require('tape-catch');
-var mech    = require('../src/node');
+var mech    = require('../../src/node');
 var $       = mech.Backbone.$;
 var _       = require('underscore');
 var sinon   = require('sinon');

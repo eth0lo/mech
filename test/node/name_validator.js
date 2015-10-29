@@ -1,7 +1,7 @@
 var test  = require('tape-catch');
 var sinon = require('sinon');
 
-var mech  = require('../src/node');
+var mech  = require('../../src/node');
 
 test('constructor', function(t) {
   var NotThrowingModel = mech.Model.extend({

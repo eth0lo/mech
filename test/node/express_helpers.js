@@ -1,4 +1,4 @@
-var mech       = require('../src/node');
+var mech       = require('../../src/node');
 var Marionette = require('backbone.marionette');
 var jade       = require('jade');
 

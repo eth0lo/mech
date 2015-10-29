@@ -3,7 +3,7 @@ var request = require('supertest');
 var sinon   = require('sinon');
 var nock    = require('nock');
 
-var mech    = require('../src/node');
+var mech    = require('../../src/node');
 var express = require('express');
 
 test('appData is present on req and res objects', function(t){
