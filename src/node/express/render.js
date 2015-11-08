@@ -10,15 +10,15 @@ module.exports = function(options) {
     var oldRender     = res.render;
 
     function bootstrapData(view, data) {
-      if(view.model) {
+      if(view && view.model) {
         data[view.model.name] = view.model.raw;
       }
 
-      if(view.collection) {
+      if(view && view.collection) {
         data[view.collection.name] = view.collection.raw;
       }
 
-      if(view.regionManager) {
+      if(view && view.regionManager) {
         view.regionManager.each(function(region) {
           bootstrapData(region.currentView, data);
         });
