@@ -1,13 +1,17 @@
-var Backbone   = require('backbone');
-var Marionette = require('backbone.marionette');
-var Model      = require('./model');
-var Collection = require('./collection');
-var View       = require('./view');
+var Backbone       = require('backbone');
+var Marionette     = require('backbone.marionette');
+var Model          = require('./model');
+var Collection     = require('./collection');
+var View           = require('./view');
+var CollectionView = require('./collection_view');
 
 module.exports = {
-  Model: Model,
   Collection: Collection,
+  Model: Model,
+
+  CollectionView: CollectionView,
   View: View,
+
   Backbone: Backbone,
-  Marionette: Marionette
+  Marionette: Marionette,
 };
