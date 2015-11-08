@@ -2,11 +2,11 @@ module.exports = function(jQuery) {
   this._deferred = jQuery.Deferred();
 
   this.listenTo(this, 'sync', function(){
-    this._deferred.resolve();
+    this._deferred.resolve(this);
   });
 
   this.listenTo(this, 'error', function(model, xhr, options){
-    this._deferred.reject(model, xhr, options);
+    this._deferred.reject(this, xhr, options);
   });
 
   // Proxy Promises methods
